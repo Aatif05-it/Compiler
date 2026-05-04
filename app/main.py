@@ -36,6 +36,7 @@ class RunRequest(BaseModel):
     language: Literal["c", "cpp", "java"]
     code: str = Field(min_length=1, max_length=50_000)
     stdin: str = Field(default="", max_length=10_000)
+    demo: bool = Field(default=False)
 
 
 class RunResponse(BaseModel):
@@ -85,9 +86,20 @@ def health() -> dict[str, str]:
 
 @app.post("/api/run", response_model=RunResponse)
 def run_code(payload: RunRequest) -> RunResponse:
+    # Demo mode: return sample output without requiring compilers
+    if payload.demo:
+        lang_name = "C" if payload.language == "c" else "C++" if payload.language == "cpp" else "Java"
+        return RunResponse(
+            compile_stdout="",
+            compile_stderr="",
+            run_stdout=f"Hello from {lang_name}!\n",
+            run_stderr="",
+            success=True,
+        )
+
     if shutil.which("gcc") is None or shutil.which("g++") is None or shutil.which("javac") is None:
         return RunResponse(
-            compile_stderr="Compiler toolchain not found. Please deploy using the provided Dockerfile.",
+            compile_stderr="Compiler toolchain not found. Click 'Demo Run' to test the UI locally, or deploy to Render for real compilation.",
             success=False,
         )
 

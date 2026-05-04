@@ -1,13 +1,29 @@
 const starterCode = {
-  c: `#include <stdio.h>\n\nint main() {\n    printf("Hello from C!\\n");\n    return 0;\n}`,
-  cpp: `#include <iostream>\nusing namespace std;\n\nint main() {\n    cout << "Hello from C++!" << endl;\n    return 0;\n}`,
-  java: `public class Main {\n    public static void main(String[] args) {\n        System.out.println("Hello from Java!");\n    }\n}`,
+  c: `#include <stdio.h>
+
+int main() {
+    printf("Hello from C!\\n");
+    return 0;
+}`,
+  cpp: `#include <iostream>
+using namespace std;
+
+int main() {
+    cout << "Hello from C++!" << endl;
+    return 0;
+}`,
+  java: `public class Main {
+    public static void main(String[] args) {
+        System.out.println("Hello from Java!");
+    }
+}`,
 };
 
 const languageEl = document.getElementById("language");
 const codeEl = document.getElementById("code");
 const stdinEl = document.getElementById("stdin");
 const runBtn = document.getElementById("runBtn");
+const demoBtn = document.getElementById("demoBtn");
 const outputEl = document.getElementById("output");
 const statusEl = document.getElementById("status");
 
@@ -17,15 +33,16 @@ function setStarterCode(language) {
   }
 }
 
-languageEl.addEventListener("change", () => {
-  codeEl.value = starterCode[languageEl.value];
-  outputEl.textContent = "Language switched.";
-});
+function updateStatus(text, type = "default") {
+  statusEl.textContent = text;
+  statusEl.className = "status-badge " + type;
+}
 
-runBtn.addEventListener("click", async () => {
+async function executeCode(useDemo = false) {
   runBtn.disabled = true;
-  statusEl.textContent = "Running...";
-  outputEl.textContent = "Compiling...";
+  demoBtn.disabled = true;
+  updateStatus("Running...", "running");
+  outputEl.textContent = "Compiling and executing...";
 
   try {
     const response = await fetch("/api/run", {
@@ -35,37 +52,66 @@ runBtn.addEventListener("click", async () => {
         language: languageEl.value,
         code: codeEl.value,
         stdin: stdinEl.value,
+        demo: useDemo,
       }),
     });
 
     const data = await response.json();
 
+    // Build output display
     const parts = [];
 
     if (data.compile_stdout) {
-      parts.push("[compile stdout]\n" + data.compile_stdout.trim());
+      parts.push("[Compile Output]\n" + data.compile_stdout.trim());
     }
     if (data.compile_stderr) {
-      parts.push("[compile stderr]\n" + data.compile_stderr.trim());
+      parts.push("[Compile Errors]\n" + data.compile_stderr.trim());
     }
     if (data.run_stdout) {
-      parts.push("[program stdout]\n" + data.run_stdout.trim());
+      parts.push("[Program Output]\n" + data.run_stdout.trim());
     }
     if (data.run_stderr) {
-      parts.push("[program stderr]\n" + data.run_stderr.trim());
+      parts.push("[Program Errors]\n" + data.run_stderr.trim());
     }
     if (parts.length === 0) {
-      parts.push("No output.");
+      parts.push("(No output)");
     }
 
     outputEl.textContent = parts.join("\n\n");
-    statusEl.textContent = data.success ? "Success" : data.timed_out ? "Timed out" : "Finished with errors";
+
+    if (data.success) {
+      updateStatus("Success ✓", "success");
+    } else if (data.timed_out) {
+      updateStatus("Timeout ⏱", "error");
+    } else {
+      updateStatus("Error ✗", "error");
+    }
   } catch (error) {
-    outputEl.textContent = "Request failed: " + error;
-    statusEl.textContent = "Request failed";
+    outputEl.textContent = "Request Failed: " + error.message;
+    updateStatus("Failed ✗", "error");
   } finally {
     runBtn.disabled = false;
+    demoBtn.disabled = false;
+  }
+}
+
+// Event Listeners
+languageEl.addEventListener("change", () => {
+  codeEl.value = starterCode[languageEl.value];
+  outputEl.textContent = "Language switched. Click Run or Demo.";
+  updateStatus("Ready", "default");
+});
+
+runBtn.addEventListener("click", () => executeCode(false));
+demoBtn.addEventListener("click", () => executeCode(true));
+
+// Keyboard shortcut: Ctrl+Enter or Cmd+Enter to run
+document.addEventListener("keydown", (e) => {
+  if ((e.ctrlKey || e.metaKey) && e.key === "Enter") {
+    executeCode(false);
   }
 });
 
+// Initialize
 setStarterCode(languageEl.value);
+updateStatus("Ready", "default");
