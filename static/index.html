@@ -3,72 +3,53 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Compiler Lab — C/C++/Java Online IDE</title>
+    <title>Free C/C++/Java Compiler</title>
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
-      href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&family=Fira+Code:wght@400;500;600&display=swap"
+      href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&family=JetBrains+Mono:wght@400;600&display=swap"
       rel="stylesheet"
     />
     <link rel="stylesheet" href="/static/styles.css" />
   </head>
   <body>
-    <header class="navbar">
-      <div class="nav-container">
-        <h1>📝 Compiler Lab</h1>
-        <p>Free Online C/C++/Java IDE</p>
-      </div>
-    </header>
+    <div class="bg-orb orb-a"></div>
+    <div class="bg-orb orb-b"></div>
 
-    <main class="container">
-      <div class="layout">
-        <!-- Editor Panel -->
-        <section class="editor-section">
-          <div class="controls-bar">
-            <div class="control-group">
-              <label for="language">Language</label>
-              <select id="language">
-                <option value="c">C</option>
-                <option value="cpp">C++</option>
-                <option value="java">Java</option>
-              </select>
-            </div>
+    <main class="shell">
+      <header class="topbar">
+        <h1>Compiler Lab</h1>
+        <p>Run C, C++, and Java code in one free deployable app.</p>
+      </header>
 
-            <div class="button-group">
-              <button id="runBtn" class="btn btn-primary">
-                ▶ Run
-              </button>
-              <button id="demoBtn" class="btn btn-secondary">
-                ✨ Demo
-              </button>
-            </div>
-          </div>
+      <section class="panel editor-panel">
+        <div class="row">
+          <label for="language">Language</label>
+          <select id="language">
+            <option value="c">C</option>
+            <option value="cpp">C++</option>
+            <option value="java">Java</option>
+          </select>
+        </div>
 
-          <div class="editor-wrapper">
-            <label for="code">Source Code</label>
-            <textarea id="code" spellcheck="false" class="code-editor"></textarea>
-          </div>
+        <label for="code">Source Code</label>
+        <textarea id="code" spellcheck="false"></textarea>
 
-          <div class="input-section">
-            <label for="stdin">Program Input (stdin)</label>
-            <textarea id="stdin" spellcheck="false" class="input-editor"></textarea>
-          </div>
-        </section>
+        <label for="stdin">Program Input (stdin)</label>
+        <textarea id="stdin" class="small" spellcheck="false"></textarea>
 
-        <!-- Output Panel -->
-        <section class="output-section">
-          <div class="output-header">
-            <h2>Output</h2>
-            <span id="status" class="status-badge">Ready</span>
-          </div>
-          <pre id="output" class="output-display">No output yet. Click Run or Demo to start.</pre>
-        </section>
-      </div>
+        <div class="actions">
+          <button id="runBtn">Compile + Run</button>
+          <button id="demoBtn">Demo</button>
+          <span id="status">Ready</span>
+        </div>
+      </section>
+
+      <section class="panel output-panel">
+        <h2>Output</h2>
+        <pre id="output">No output yet.</pre>
+      </section>
     </main>
-
-    <footer class="footer">
-      <p>💡 Tip: Use Demo mode to test the UI without compilers installed. Deploy to Render for full compilation support.</p>
-    </footer>
 
     <script src="/static/app.js"></script>
   </body>

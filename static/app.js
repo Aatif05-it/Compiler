@@ -1,22 +1,7 @@
 const starterCode = {
-  c: `#include <stdio.h>
-
-int main() {
-    printf("Hello from C!\\n");
-    return 0;
-}`,
-  cpp: `#include <iostream>
-using namespace std;
-
-int main() {
-    cout << "Hello from C++!" << endl;
-    return 0;
-}`,
-  java: `public class Main {
-    public static void main(String[] args) {
-        System.out.println("Hello from Java!");
-    }
-}`,
+  c: `#include <stdio.h>\n\nint main() {\n    printf("Hello from C!\\n");\n    return 0;\n}`,
+  cpp: `#include <iostream>\nusing namespace std;\n\nint main() {\n    cout << "Hello from C++!" << endl;\n    return 0;\n}`,
+  java: `public class Main {\n    public static void main(String[] args) {\n        System.out.println("Hello from Java!");\n    }\n}`,
 };
 
 const languageEl = document.getElementById("language");
@@ -33,16 +18,11 @@ function setStarterCode(language) {
   }
 }
 
-function updateStatus(text, type = "default") {
-  statusEl.textContent = text;
-  statusEl.className = "status-badge " + type;
-}
-
 async function executeCode(useDemo = false) {
   runBtn.disabled = true;
   demoBtn.disabled = true;
-  updateStatus("Running...", "running");
-  outputEl.textContent = "Compiling and executing...";
+  statusEl.textContent = useDemo ? "Demo..." : "Running...";
+  outputEl.textContent = "Compiling...";
 
   try {
     const response = await fetch("/api/run", {
@@ -58,60 +38,41 @@ async function executeCode(useDemo = false) {
 
     const data = await response.json();
 
-    // Build output display
     const parts = [];
 
     if (data.compile_stdout) {
-      parts.push("[Compile Output]\n" + data.compile_stdout.trim());
+      parts.push("[compile stdout]\n" + data.compile_stdout.trim());
     }
     if (data.compile_stderr) {
-      parts.push("[Compile Errors]\n" + data.compile_stderr.trim());
+      parts.push("[compile stderr]\n" + data.compile_stderr.trim());
     }
     if (data.run_stdout) {
-      parts.push("[Program Output]\n" + data.run_stdout.trim());
+      parts.push("[program stdout]\n" + data.run_stdout.trim());
     }
     if (data.run_stderr) {
-      parts.push("[Program Errors]\n" + data.run_stderr.trim());
+      parts.push("[program stderr]\n" + data.run_stderr.trim());
     }
     if (parts.length === 0) {
-      parts.push("(No output)");
+      parts.push("No output.");
     }
 
     outputEl.textContent = parts.join("\n\n");
-
-    if (data.success) {
-      updateStatus("Success ✓", "success");
-    } else if (data.timed_out) {
-      updateStatus("Timeout ⏱", "error");
-    } else {
-      updateStatus("Error ✗", "error");
-    }
+    statusEl.textContent = data.success ? "Success" : data.timed_out ? "Timed out" : "Finished with errors";
   } catch (error) {
-    outputEl.textContent = "Request Failed: " + error.message;
-    updateStatus("Failed ✗", "error");
+    outputEl.textContent = "Request failed: " + error;
+    statusEl.textContent = "Request failed";
   } finally {
     runBtn.disabled = false;
     demoBtn.disabled = false;
   }
 }
 
-// Event Listeners
 languageEl.addEventListener("change", () => {
   codeEl.value = starterCode[languageEl.value];
-  outputEl.textContent = "Language switched. Click Run or Demo.";
-  updateStatus("Ready", "default");
+  outputEl.textContent = "Language switched.";
 });
 
 runBtn.addEventListener("click", () => executeCode(false));
 demoBtn.addEventListener("click", () => executeCode(true));
 
-// Keyboard shortcut: Ctrl+Enter or Cmd+Enter to run
-document.addEventListener("keydown", (e) => {
-  if ((e.ctrlKey || e.metaKey) && e.key === "Enter") {
-    executeCode(false);
-  }
-});
-
-// Initialize
 setStarterCode(languageEl.value);
-updateStatus("Ready", "default");
