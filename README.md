@@ -1,3 +1,41 @@
+# Free C/C++/Java Compiler
+
+This project is a simple web-based compiler (C, C++, Java) built with FastAPI and a vanilla frontend. It includes a Dockerfile and a Render blueprint for easy deployment.
+
+Quick structure:
+
+- `frontend/` — static frontend (`index.html`, `styles.css`, `app.js`) served from the backend
+- `backend/` — FastAPI app, `backend/app/main.py`, `backend/Dockerfile`, and `backend/requirements.txt`
+
+Deploy to Render (recommended)
+1. Push code to GitHub (already done).
+2. Go to https://render.com and create a new Web Service.
+3. Choose your GitHub repo `Aatif05-it/Compiler` and branch `main`.
+4. For **Environment**, choose **Docker**.
+5. Set the **Dockerfile path** to `backend/Dockerfile`.
+6. Set the **Health Check Path** to `/health` and enable **Auto Deploy**.
+7. Deploy — Render will build and run the container. The service exposes dynamic `PORT` automatically.
+
+Local testing (VS Code)
+1. From the repository root, install dependencies into a virtualenv and activate it.
+
+```powershell
+python -m venv .venv
+. .venv\Scripts\activate
+pip install -r backend/requirements.txt
+```
+
+2. Run the backend locally (it serves the frontend static files):
+
+```powershell
+python -m uvicorn backend.app.main:app --host 127.0.0.1 --port 8000 --reload
+```
+
+3. Open http://127.0.0.1:8000 in your browser.
+
+Notes
+- For real compilation (non-demo) in Render, the Docker image installs `gcc`, `g++`, and `default-jdk-headless`.
+- If you want Vercel for the frontend only, deploy the `frontend/` folder separately and point the API calls to the Render service URL.
 # Free C/C++/Java Compiler (Deployable)
 
 A web app that compiles and runs user code in:

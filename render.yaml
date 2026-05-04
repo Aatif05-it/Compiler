@@ -1,5 +1,14 @@
 services:
   - type: web
+    name: compiler-backend
+    env: docker
+    branch: main
+    dockerfilePath: backend/Dockerfile
+    plan: free
+    autoDeploy: true
+    healthCheckPath: /health
+services:
+  - type: web
     name: compiler-lab
     runtime: docker
     plan: free
