@@ -8,7 +8,6 @@ const languageEl = document.getElementById("language");
 const codeEl = document.getElementById("code");
 const stdinEl = document.getElementById("stdin");
 const runBtn = document.getElementById("runBtn");
-const demoBtn = document.getElementById("demoBtn");
 const outputEl = document.getElementById("output");
 const statusEl = document.getElementById("status");
 
@@ -18,10 +17,9 @@ function setStarterCode(language) {
   }
 }
 
-async function executeCode(useDemo = false) {
+async function executeCode() {
   runBtn.disabled = true;
-  demoBtn.disabled = true;
-  statusEl.textContent = useDemo ? "Demo..." : "Running...";
+  statusEl.textContent = "Running...";
   outputEl.textContent = "Compiling...";
 
   try {
@@ -32,7 +30,6 @@ async function executeCode(useDemo = false) {
         language: languageEl.value,
         code: codeEl.value,
         stdin: stdinEl.value,
-        demo: useDemo,
       }),
     });
 
@@ -63,7 +60,6 @@ async function executeCode(useDemo = false) {
     statusEl.textContent = "Request failed";
   } finally {
     runBtn.disabled = false;
-    demoBtn.disabled = false;
   }
 }
 
@@ -72,7 +68,6 @@ languageEl.addEventListener("change", () => {
   outputEl.textContent = "Language switched.";
 });
 
-runBtn.addEventListener("click", () => executeCode(false));
-demoBtn.addEventListener("click", () => executeCode(true));
+runBtn.addEventListener("click", () => executeCode());
 
 setStarterCode(languageEl.value);
