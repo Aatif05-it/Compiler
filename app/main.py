@@ -28,7 +28,7 @@ app.add_middleware(
 )
 
 
-static_path = pathlib.Path(__file__).resolve().parent.parent / "static"
+static_path = pathlib.Path(__file__).resolve().parent.parent / "frontend"
 app.mount("/static", StaticFiles(directory=static_path), name="static")
 
 
@@ -72,6 +72,17 @@ def _run_command(command: list[str], cwd: str, stdin: str = "", timeout: int = 5
 
 def _binary_name(base_name: str) -> str:
     return f".\\{base_name}.exe" if os.name == "nt" else f"./{base_name}"
+
+
+def _java_compile_command() -> list[str]:
+    return [
+        "javac",
+        "-J-Xms16m",
+        "-J-Xmx128m",
+        "-J-XX:ReservedCodeCacheSize=64m",
+        "-J-XX:+UseSerialGC",
+        "Main.java",
+    ]
 
 
 def _java_run_command(class_name: str) -> list[str]:
@@ -145,7 +156,7 @@ def run_code(payload: RunRequest) -> RunResponse:
             else:
                 source = pathlib.Path(tmp) / "Main.java"
                 source.write_text(payload.code, encoding="utf-8")
-                compile_result = _run_command(["javac", "Main.java"], cwd=tmp, timeout=10)
+                compile_result = _run_command(_java_compile_command(), cwd=tmp, timeout=10)
                 if compile_result.returncode != 0:
                     return RunResponse(
                         compile_stdout=compile_result.stdout,
