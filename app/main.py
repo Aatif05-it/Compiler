@@ -79,8 +79,8 @@ def _java_compile_command() -> list[str]:
     return [
         "javac",
         "-J-Xms8m",
-        "-J-Xmx64m",
-        "-J-XX:ReservedCodeCacheSize=16m",
+        "-J-Xmx32m",
+        "-J-XX:ReservedCodeCacheSize=8m",
         "-J-XX:+UseSerialGC",
         "Main.java",
     ]
@@ -90,8 +90,8 @@ def _java_run_command(class_name: str) -> list[str]:
     return [
         "java",
         "-Xms8m",
-        "-Xmx64m",
-        "-XX:ReservedCodeCacheSize=16m",
+        "-Xmx32m",
+        "-XX:ReservedCodeCacheSize=8m",
         "-XX:+UseSerialGC",
         class_name,
     ]
