@@ -17,6 +17,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel, Field
+import requests
 
 app = FastAPI(title="Free C/C++/Java Compiler")
 
@@ -120,7 +121,25 @@ def run_code(payload: RunRequest) -> RunResponse:
             success=True,
         )
 
-    if shutil.which("gcc") is None or shutil.which("g++") is None or shutil.which("javac") is None:
+    if payload.language == "java":
+        java_url = os.getenv("JAVA_SERVICE_URL", "http://localhost:9000/api/run_java")
+        try:
+            resp = requests.post(java_url, json={"code": payload.code, "stdin": payload.stdin}, timeout=15)
+            if resp.status_code != 200:
+                return RunResponse(compile_stderr=f"Java service error: HTTP {resp.status_code}", success=False)
+            data = resp.json()
+            return RunResponse(
+                compile_stdout=data.get("compile_stdout", ""),
+                compile_stderr=data.get("compile_stderr", ""),
+                run_stdout=data.get("run_stdout", ""),
+                run_stderr=data.get("run_stderr", ""),
+                timed_out=data.get("timed_out", False),
+                success=data.get("success", False),
+            )
+        except requests.RequestException as exc:
+            return RunResponse(compile_stderr=f"Failed to contact Java service: {exc}", success=False)
+
+    if shutil.which("gcc") is None or shutil.which("g++") is None:
         return RunResponse(
             compile_stderr="Compiler toolchain not found. Deploy to Render with Docker for real compilation.",
             success=False,

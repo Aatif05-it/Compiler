@@ -15,3 +15,11 @@ services:
     autoDeploy: true
     dockerfilePath: ./Dockerfile
     healthCheckPath: /health
+  - type: web
+    name: java-service
+    env: docker
+    branch: main
+    dockerfilePath: java_service/Dockerfile
+    plan: starter
+    autoDeploy: false
+    healthCheckPath: /health
