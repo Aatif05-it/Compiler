@@ -78,9 +78,9 @@ def _binary_name(base_name: str) -> str:
 def _java_compile_command() -> list[str]:
     return [
         "javac",
-        "-J-Xms16m",
-        "-J-Xmx128m",
-        "-J-XX:ReservedCodeCacheSize=64m",
+        "-J-Xms8m",
+        "-J-Xmx64m",
+        "-J-XX:ReservedCodeCacheSize=16m",
         "-J-XX:+UseSerialGC",
         "Main.java",
     ]
@@ -89,9 +89,9 @@ def _java_compile_command() -> list[str]:
 def _java_run_command(class_name: str) -> list[str]:
     return [
         "java",
-        "-Xms16m",
-        "-Xmx128m",
-        "-XX:ReservedCodeCacheSize=64m",
+        "-Xms8m",
+        "-Xmx64m",
+        "-XX:ReservedCodeCacheSize=16m",
         "-XX:+UseSerialGC",
         class_name,
     ]
