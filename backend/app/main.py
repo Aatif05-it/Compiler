@@ -75,6 +75,17 @@ def _binary_name(base_name: str) -> str:
     return f".\\{base_name}.exe" if os.name == "nt" else f"./{base_name}"
 
 
+def _java_run_command(class_name: str) -> list[str]:
+    return [
+        "java",
+        "-Xms16m",
+        "-Xmx128m",
+        "-XX:ReservedCodeCacheSize=64m",
+        "-XX:+UseSerialGC",
+        class_name,
+    ]
+
+
 @app.get("/")
 def home() -> FileResponse:
     return FileResponse(static_path / "index.html")
@@ -142,7 +153,7 @@ def run_code(payload: RunRequest) -> RunResponse:
                         compile_stderr=compile_result.stderr,
                         success=False,
                     )
-                run_result = _run_command(["java", "Main"], cwd=tmp, stdin=payload.stdin, timeout=5)
+                run_result = _run_command(_java_run_command("Main"), cwd=tmp, stdin=payload.stdin, timeout=5)
 
             return RunResponse(
                 compile_stdout=compile_result.stdout,
